@@ -6,7 +6,6 @@ import random
 import time
 
 def draw_custom_sphere(radius, slices, stacks):
-    """Custom sphere implementation to replace glutSolidSphere"""
     glBegin(GL_TRIANGLES)
     
     for i in range(stacks):
@@ -2043,6 +2042,11 @@ class Game:
         self.cheat_mode = False
         self.auto_rotate_angle = 0
         
+        # Python time-based timing system
+        self.start_time = time.time()  # Game start time reference
+        self.last_frame_time = time.time()  # For delta time calculations
+        self.frame_count = 0
+        
         # Countdown timer system
         self.countdown_timer = 30.0  # 30 seconds default
         self.max_countdown_timer = 30.0
@@ -2069,6 +2073,42 @@ class Game:
         
         self.initialize_enemies()
         self.bomb_system.initialize_bombs()
+    
+    def get_current_time(self):
+        """Get current time in seconds since game start"""
+        return time.time() - self.start_time
+    
+    def get_current_time_ms(self):
+        """Get current time in milliseconds since game start"""
+        return (time.time() - self.start_time) * 1000
+    
+    def get_delta_time(self):
+        """Get time difference since last frame in seconds"""
+        current_time = time.time()
+        delta = current_time - self.last_frame_time
+        self.last_frame_time = current_time
+        self.frame_count += 1
+        return delta
+    
+    def get_fps(self):
+        """Get approximate frames per second"""
+        elapsed = time.time() - self.start_time
+        if elapsed > 0:
+            return self.frame_count / elapsed
+        return 0
+    
+    def limit_frame_rate(self, target_fps=60):
+        """Limit frame rate using time.sleep() - demonstrates Python time functionality"""
+        if target_fps <= 0:
+            return
+        
+        target_frame_time = 1.0 / target_fps
+        current_time = time.time()
+        frame_time = current_time - self.last_frame_time
+        
+        if frame_time < target_frame_time:
+            sleep_time = target_frame_time - frame_time
+            time.sleep(sleep_time)  # Use Python's time.sleep() for frame rate control
     
     def initialize_enemies(self):
   
@@ -2392,6 +2432,9 @@ class Game:
         self.explosion_effects = active_explosions
     
     def update(self):
+        # Calculate delta time for frame-independent updates
+        delta_time = self.get_delta_time()
+        
         if not self.game_over:
             self.player.update_movement(self.cover_system, self.enemies)  # Update player movement with collision detection
             # self.skybox.update()
@@ -2415,7 +2458,7 @@ class Game:
             if self.timer_active:
                 current_time = time.time()
                 elapsed_time = current_time - self.countdown_start_time
-                self.countdown_timer = max(0, self.max_countdown_timer - elapsed_time + self.bonus_time)
+                self.countdown_timer = max(0, self.max_countdown_timer + self.bonus_time - elapsed_time)
                 if self.countdown_timer <= 0:
                     self.countdown_timer = 0
                     self.timer_active = False
@@ -2626,6 +2669,8 @@ def mouse_listener(button, state, x, y):
 def idle():
     global game
     game.update()
+    # Demonstrate Python time functionality with frame rate control
+    game.limit_frame_rate(60)  # Uses time.sleep() internally
     glutPostRedisplay()
 
 def display():

@@ -6,7 +6,6 @@ import random
 import time
 
 def draw_custom_sphere(radius, slices, stacks):
-    """Custom sphere implementation to replace glutSolidSphere"""
     glBegin(GL_TRIANGLES)
     
     for i in range(stacks):
@@ -2685,7 +2684,7 @@ def main():
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     glutInitWindowSize(1000, 800)
     glutInitWindowPosition(100, 100)
-    window = glutCreateWindow(b"Bullet Frenzy - 3D Game (OOP Version)")
+    glutCreateWindow(b"Bullet Frenzy - 3D Game")
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
