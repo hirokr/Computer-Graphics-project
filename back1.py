@@ -3,6 +3,60 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import math
 import random
+import time
+
+def draw_custom_sphere(radius, slices, stacks):
+    """Custom sphere implementation to replace glutSolidSphere"""
+    glBegin(GL_TRIANGLES)
+    
+    for i in range(stacks):
+        lat0 = math.pi * (-0.5 + float(i) / stacks)
+        z0 = math.sin(lat0)
+        zr0 = math.cos(lat0)
+        
+        lat1 = math.pi * (-0.5 + float(i + 1) / stacks)
+        z1 = math.sin(lat1)
+        zr1 = math.cos(lat1)
+        
+        for j in range(slices):
+            lng = 2 * math.pi * float(j) / slices
+            x = math.cos(lng)
+            y = math.sin(lng)
+            
+            # First triangle
+            # Vertex 1
+            nx1, ny1, nz1 = x * zr0, y * zr0, z0
+            glNormal3f(nx1, ny1, nz1)
+            glVertex3f(radius * nx1, radius * ny1, radius * nz1)
+            
+            # Vertex 2
+            lng_next = 2 * math.pi * float(j + 1) / slices
+            x_next = math.cos(lng_next)
+            y_next = math.sin(lng_next)
+            nx2, ny2, nz2 = x_next * zr0, y_next * zr0, z0
+            glNormal3f(nx2, ny2, nz2)
+            glVertex3f(radius * nx2, radius * ny2, radius * nz2)
+            
+            # Vertex 3
+            nx3, ny3, nz3 = x * zr1, y * zr1, z1
+            glNormal3f(nx3, ny3, nz3)
+            glVertex3f(radius * nx3, radius * ny3, radius * nz3)
+            
+            # Second triangle
+            # Vertex 1 (same as vertex 2 from first triangle)
+            glNormal3f(nx2, ny2, nz2)
+            glVertex3f(radius * nx2, radius * ny2, radius * nz2)
+            
+            # Vertex 2
+            nx4, ny4, nz4 = x_next * zr1, y_next * zr1, z1
+            glNormal3f(nx4, ny4, nz4)
+            glVertex3f(radius * nx4, radius * ny4, radius * nz4)
+            
+            # Vertex 3 (same as vertex 3 from first triangle)
+            glNormal3f(nx3, ny3, nz3)
+            glVertex3f(radius * nx3, radius * ny3, radius * nz3)
+    
+    glEnd()
 
 class Vector3:
     def __init__(self, x=0, y=0, z=0):
@@ -112,7 +166,7 @@ class EnemyProjectile:
         glPushMatrix()
         glTranslatef(self.position.x, self.position.y, self.position.z)
         glColor3f(0.5, 0.0, 1.0)  # Purple projectile
-        glutSolidSphere(self.size, 8, 8)
+        draw_custom_sphere(self.size, 8, 8)
         glPopMatrix()
         
     def check_collision_with_player(self, player, player_radius=15):
@@ -261,7 +315,7 @@ class Enemy:
             glColor3f(0.8, 0.4, 0.4)  # Reddish skin when targeting
         else:
             glColor3f(0.7, 0.5, 0.4)  # Normal skin color
-        glutSolidSphere(8, 12, 12)
+        draw_custom_sphere(8, 12, 12)
         glPopMatrix()
         
         # Torso
@@ -363,7 +417,7 @@ class Enemy:
             glPushMatrix()
             glTranslatef(0, 25, 8)
             glColor3f(1.0, 1.0, 0.0)  # Yellow flash
-            glutSolidSphere(3, 8, 8)
+            draw_custom_sphere(3, 8, 8)
             glPopMatrix()
         
         glPopMatrix()
@@ -767,7 +821,7 @@ class Player:
         glPushMatrix()
         glTranslatef(0, 0, 20)
         glColor3f(0.9, 0.7, 0.6)  # Skin color
-        glutSolidSphere(8, 12, 12)
+        draw_custom_sphere(8, 12, 12)
         glPopMatrix()
         
         # Torso
@@ -874,7 +928,7 @@ class Player:
         glPushMatrix()
         glTranslatef(0, 23, 10)  # Adjusted to stay at barrel tip for aiming reference
         glColor3f(0.8, 0.8, 0.1)  # Yellow sight
-        glutSolidSphere(1, 8, 8)
+        draw_custom_sphere(1, 8, 8)
         glPopMatrix()
         
         glPopMatrix()  # End gun rotation
@@ -1093,7 +1147,7 @@ class Bomb:
                     glColor3f(r * 0.4, g * 0.4, b * 0.4)
             
             # Draw the main bomb sphere
-            glutSolidSphere(self.radius, 16, 16)
+            draw_custom_sphere(self.radius, 16, 16)
             
             # Draw the fuse
             glPushMatrix()
@@ -1121,7 +1175,7 @@ class Bomb:
                 else:
                     glColor4f(1.0, 0.0, 0.0, alpha * 0.5)  # Red outer
                     
-                glutSolidSphere(layer_size, 16, 16)
+                draw_custom_sphere(layer_size, 16, 16)
                 glPopMatrix()
                 
         glPopMatrix()
@@ -1277,26 +1331,26 @@ class PowerUp:
         glPushMatrix()
         glTranslatef(0, -8, 0)
         glScalef(0.8, 1.2, 0.8)
-        glutSolidSphere(8, 12, 12)
+        draw_custom_sphere(8, 12, 12)
         glPopMatrix()
         
         # Left lobe of heart
         glPushMatrix()
         glTranslatef(-6, 2, 0)
-        glutSolidSphere(7, 12, 12)
+        draw_custom_sphere(7, 12, 12)
         glPopMatrix()
         
         # Right lobe of heart
         glPushMatrix()
         glTranslatef(6, 2, 0)
-        glutSolidSphere(7, 12, 12)
+        draw_custom_sphere(7, 12, 12)
         glPopMatrix()
         
         # Center connection
         glPushMatrix()
         glTranslatef(0, 0, 0)
         glScalef(1.2, 0.8, 0.8)
-        glutSolidSphere(6, 12, 12)
+        draw_custom_sphere(6, 12, 12)
         glPopMatrix()
         
         # Inner glowing core (smaller heart)
@@ -1306,19 +1360,19 @@ class PowerUp:
         glPushMatrix()
         glTranslatef(0, -6, 0)
         glScalef(0.6, 0.8, 0.6)
-        glutSolidSphere(5, 8, 8)
+        draw_custom_sphere(5, 8, 8)
         glPopMatrix()
         
         # Core left lobe
         glPushMatrix()
         glTranslatef(-4, 1, 0)
-        glutSolidSphere(4, 8, 8)
+        draw_custom_sphere(4, 8, 8)
         glPopMatrix()
         
         # Core right lobe
         glPushMatrix()
         glTranslatef(4, 1, 0)
-        glutSolidSphere(4, 8, 8)
+        draw_custom_sphere(4, 8, 8)
         glPopMatrix()
         
         # Sparkle effect around heart
@@ -1329,7 +1383,7 @@ class PowerUp:
             y = 15 * math.sin(angle)
             glPushMatrix()
             glTranslatef(x, y, 0)
-            glutSolidSphere(1.5, 6, 6)
+            draw_custom_sphere(1.5, 6, 6)
             glPopMatrix()
         glPopMatrix()
     
@@ -1523,7 +1577,7 @@ class Avatar:
         """Draw avatar head with facial features"""
         # Head
         glColor3f(0.8, 0.6, 0.4)  # Skin tone
-        glutSolidSphere(12, 16, 16)
+        draw_custom_sphere(12, 16, 16)
         
         # Eyes
         eye_open = self.eye_blink_timer > 5  # Blink effect
@@ -1533,7 +1587,7 @@ class Avatar:
         for x_offset in [-4, 4]:
             glPushMatrix()
             glTranslatef(x_offset, 8, 2)
-            glutSolidSphere(eye_size, 8, 8)
+            draw_custom_sphere(eye_size, 8, 8)
             glPopMatrix()
         
         if eye_open:
@@ -1542,7 +1596,7 @@ class Avatar:
             for x_offset in [-4, 4]:
                 glPushMatrix()
                 glTranslatef(x_offset, 9, 2)
-                glutSolidSphere(1, 6, 6)
+                draw_custom_sphere(1, 6, 6)
                 glPopMatrix()
         
         # Nose
@@ -1558,7 +1612,7 @@ class Avatar:
         glPushMatrix()
         glTranslatef(0, 4, -2)
         if self.expression_state == 'surprised':
-            glutSolidSphere(2, 8, 8)  # Open mouth
+            draw_custom_sphere(2, 8, 8)  # Open mouth
         else:
             glScalef(4, 1, 1)
             glutSolidCube(1)  # Normal mouth
@@ -1594,7 +1648,7 @@ class Particle:
         glPushMatrix()
         glTranslatef(self.position.x, self.position.y, self.position.z)
         glColor4f(self.color[0], self.color[1], self.color[2], self.color[3])
-        glutSolidSphere(self.size, 6, 6)
+        draw_custom_sphere(self.size, 6, 6)
         glPopMatrix()
 
 class ExplosionEffect:
@@ -1834,7 +1888,7 @@ class CoverObject:
             # Fading damage mark
             alpha = 1.0 - (effect['time'] / effect['max_time'])
             glColor3f(1.0 * alpha, 0.2 * alpha, 0.0 * alpha)
-            glutSolidSphere(3, 6, 6)
+            draw_custom_sphere(3, 6, 6)
             glPopMatrix()
         
         glPopMatrix()
@@ -2225,7 +2279,7 @@ class Game:
         
         direction = self.player.get_gun_direction()
         if self.can_hit_enemy_precisely(direction):
-            current_time = glutGet(GLUT_ELAPSED_TIME)
+            current_time = time.time() * 1000  # Convert to milliseconds for consistency
             if not hasattr(self, 'last_cheat_shot_time'):
                 self.last_cheat_shot_time = 0
             
