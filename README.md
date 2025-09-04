@@ -20,7 +20,7 @@ Ensure you have Python 3.7 or higher installed on your system.
 Install the following Python packages using pip:
 
 ```bash
-pip install PyOpenGL PyOpenGL_accelerate
+pip install PyOpenGL
 ```
 
 ### Alternative Installation
@@ -28,7 +28,6 @@ If you encounter issues with the above command, try:
 
 ```bash
 pip install PyOpenGL==3.1.5
-pip install PyOpenGL_accelerate==3.1.5
 ```
 
 ### Running the Game
@@ -106,112 +105,6 @@ Collect heart-shaped power-ups that provide various enhancements:
 - **Accuracy Monitoring**: Tracks bullets fired vs. hits
 - **Survival Timer**: Real-time countdown with bonus time mechanics
 - **Performance Metrics**: FPS counter and frame rate optimization
-
-## System Requirements
-
-### Minimum Requirements
-- **Operating System**: Windows 10/11, macOS 10.14+, or Linux (Ubuntu 18.04+)
-- **Python Version**: Python 3.7 or higher
-- **Graphics**: OpenGL 2.1 compatible graphics card
-- **Memory**: 4 GB RAM
-- **Storage**: 100 MB available space
-
-### Recommended Requirements
-- **Operating System**: Windows 11, macOS 12+, or Linux (Ubuntu 20.04+)
-- **Python Version**: Python 3.9 or higher
-- **Graphics**: Dedicated graphics card with OpenGL 3.3+ support
-- **Memory**: 8 GB RAM
-- **Storage**: 200 MB available space
-- **Display**: 1920x1080 resolution or higher
-
-### Performance Notes
-- The game targets 60 FPS for optimal gameplay experience
-- Lower-end systems may experience reduced frame rates during intense combat scenes
-- Graphics settings are automatically optimized based on system capabilities
-
-## Known Issues and Troubleshooting
-
-### Common Issues
-
-#### 1. PyOpenGL Installation Problems
-**Problem**: `ImportError: No module named 'OpenGL'`
-
-**Solutions**:
-- Ensure pip is up to date: `pip install --upgrade pip`
-- Try alternative installation: `pip install PyOpenGL-accelerate`
-- On Windows, install Visual C++ Redistributable
-- On macOS, install Xcode command line tools: `xcode-select --install`
-- On Linux, install development packages: `sudo apt-get install python3-opengl`
-
-#### 2. Graphics Performance Issues
-**Problem**: Low frame rate or stuttering gameplay
-
-**Solutions**:
-- Update graphics drivers to the latest version
-- Close other graphics-intensive applications
-- Enable cheat mode (C key) for testing without performance constraints
-- Reduce window size if running in windowed mode
-
-#### 3. Window Display Problems
-**Problem**: Game window doesn't appear or appears corrupted
-
-**Solutions**:
-- Check if multiple monitors are connected and try different display settings
-- Verify OpenGL support: Run `python -c "from OpenGL import GL; print(GL.glGetString(GL.GL_VERSION))"`
-- Update or reinstall graphics drivers
-- Try running with administrator privileges (Windows)
-
-#### 4. Input Lag or Unresponsive Controls
-**Problem**: Delayed response to keyboard/mouse input
-
-**Solutions**:
-- Ensure the game window has focus (click on it)
-- Check for background applications consuming CPU resources
-- Restart the game if controls become unresponsive
-- Verify keyboard layout settings
-
-#### 5. Audio Issues
-**Problem**: No sound effects (Note: This game currently focuses on visual experience)
-
-**Solutions**:
-- The current version is primarily a visual experience
-- Sound effects may be added in future updates
-- Focus on visual feedback for game events
-
-### Advanced Troubleshooting
-
-#### Debug Mode
-To enable additional debugging information:
-1. Open `main.py` in a text editor
-2. Look for debug flags or add print statements for troubleshooting
-3. Monitor console output for error messages
-
-#### System Compatibility
-- **Windows**: Tested on Windows 10/11 with various graphics cards
-- **macOS**: Compatible with Intel and Apple Silicon Macs
-- **Linux**: Tested on Ubuntu, may require additional OpenGL libraries
-
-#### Performance Optimization
-- The game includes frame rate limiting to maintain consistent performance
-- Explosion effects and particle systems are optimized for smooth gameplay
-- Large numbers of enemies may impact performance on older systems
-
-### Getting Help
-
-If you encounter issues not covered in this troubleshooting section:
-1. Check the console output for specific error messages
-2. Verify all dependencies are correctly installed
-3. Ensure your system meets the minimum requirements
-4. Try running the game in different compatibility modes
-
-### Development Notes
-
-- The game uses custom OpenGL rendering for optimal performance
-- All 3D models are procedurally generated using mathematical functions
-- The physics system is custom-built for tactical combat mechanics
-- Frame rate is capped at 60 FPS for consistent gameplay experience
-
----
 
 **Enjoy your tactical combat experience in 3D Combat Arena!**
 
