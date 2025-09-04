@@ -2047,6 +2047,8 @@ class Game:
         self.countdown_timer = 30.0  # 30 seconds default
         self.max_countdown_timer = 30.0
         self.timer_active = True
+        self.countdown_start_time = time.time()  # When countdown started
+        self.bonus_time = 0.0  # Accumulated bonus time from enemy kills
         
         # Explosion state tracking
         self.explosion_active = False
@@ -2173,9 +2175,11 @@ class Game:
                     
                     # Add 5 seconds to timer as reward for killing enemy
                     if self.timer_active:
-                        self.countdown_timer += 5.0
-                        if self.countdown_timer > self.max_countdown_timer:
-                            self.countdown_timer = self.max_countdown_timer
+                        self.bonus_time += 5.0
+                        # Cap the total time (base + bonus) at a reasonable maximum
+                        max_total_time = self.max_countdown_timer * 3  # Allow up to 3x the original timer
+                        if self.bonus_time > max_total_time - self.max_countdown_timer:
+                            self.bonus_time = max_total_time - self.max_countdown_timer
                     
                     print(f"Enemy hit! Score: {self.game_score}, Eliminated: {self.enemies_eliminated}")
                     
@@ -2345,6 +2349,8 @@ class Game:
         # Reset countdown timer
         self.countdown_timer = 30.0
         self.timer_active = True
+        self.countdown_start_time = time.time()  # Reset countdown start time
+        self.bonus_time = 0.0  # Reset bonus time
         
         # Reset explosion state
         self.explosion_active = False
@@ -2405,9 +2411,11 @@ class Game:
             # Update explosion effects and calculate screen shake
             self.update_explosion_effects()
             
-            # Update countdown timer
+            # Update countdown timer using actual time with bonus time
             if self.timer_active:
-                self.countdown_timer -= 1.0/60.0  # Decrease by 1/60 second per frame (assuming 60 FPS)
+                current_time = time.time()
+                elapsed_time = current_time - self.countdown_start_time
+                self.countdown_timer = max(0, self.max_countdown_timer - elapsed_time + self.bonus_time)
                 if self.countdown_timer <= 0:
                     self.countdown_timer = 0
                     self.timer_active = False
