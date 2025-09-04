@@ -124,7 +124,7 @@ class EnemyProjectile:
             distance = self.position.distance_to(player.position)
             return distance < (self.size + player_radius)
 
-class AIEnemy:
+class Enemy:
     def __init__(self, position):
         self.position = Vector3(position.x, position.y, position.z)
         self.original_position = Vector3(position.x, position.y, position.z)
@@ -959,94 +959,6 @@ class Camera:
         else:
             gluLookAt(self.position.x + shake_x, self.position.y + shake_y, self.position.z + shake_z,
                         0, 0, 60, 0, 0, 1)
-
-class Skybox:
-    def __init__(self):
-        self.sun_rotation = 0
-        self.moon_rotation = 0
-        self.star_rotation = 0
-        self.time = 0
-        
-    def update(self):
-        self.time += 0.02
-        self.sun_rotation += 0.5
-        self.moon_rotation += 0.3
-        self.star_rotation += 0.1
-        
-        if self.sun_rotation >= 360:
-            self.sun_rotation -= 360
-        if self.moon_rotation >= 360:
-            self.moon_rotation -= 360
-        if self.star_rotation >= 360:
-            self.star_rotation -= 360
-    
-    def draw(self):
-        glPushMatrix()
-        
-        # Draw distant stars as small spheres
-        for i in range(20):
-            angle = i * 18  # 360/20 = 18 degrees apart
-            radius = 1200
-            
-            glPushMatrix()
-            glRotatef(self.star_rotation + angle, 0, 0, 1)
-            glTranslatef(radius, 0, 400 + 100 * math.sin(self.time + i))
-            glColor3f(1.0, 1.0, 0.8)
-            glutSolidSphere(8, 6, 6)
-            glPopMatrix()
-        
-        # Draw animated sun
-        glPushMatrix()
-        glRotatef(self.sun_rotation, 0, 0, 1)
-        glTranslatef(800, 0, 600)
-        glColor3f(1.0, 0.8, 0.0)
-        glutSolidSphere(60, 12, 12)
-        
-        # Sun rays using cylinders
-        for i in range(8):
-            glPushMatrix()
-            glRotatef(i * 45, 0, 0, 1)
-            glTranslatef(80, 0, 0)
-            glRotatef(90, 0, 1, 0)
-            glColor3f(1.0, 0.9, 0.2)
-            gluCylinder(gluNewQuadric(), 3, 1, 30, 6, 6)
-            glPopMatrix()
-        glPopMatrix()
-        
-        # Draw animated moon
-        glPushMatrix()
-        glRotatef(self.moon_rotation, 0, 0, 1)
-        glTranslatef(-700, 0, 500)
-        glColor3f(0.8, 0.8, 0.9)
-        glutSolidSphere(40, 10, 10)
-        
-        # Moon craters
-        glPushMatrix()
-        glTranslatef(15, 15, 20)
-        glColor3f(0.6, 0.6, 0.7)
-        glutSolidSphere(8, 6, 6)
-        glPopMatrix()
-        
-        glPushMatrix()
-        glTranslatef(-10, 20, 25)
-        glColor3f(0.6, 0.6, 0.7)
-        glutSolidSphere(5, 6, 6)
-        glPopMatrix()
-        glPopMatrix()
-        
-        # Draw floating celestial rings
-        for i in range(3):
-            glPushMatrix()
-            glRotatef(self.time * 20 + i * 120, 0, 0, 1)
-            glTranslatef(900 + i * 100, 0, 700 + i * 50)
-            glRotatef(90, 1, 0, 0)
-            glColor3f(0.5 + i * 0.2, 0.3, 0.8 - i * 0.2)
-            
-            # Create ring using cylinder with hollow center
-            gluCylinder(gluNewQuadric(), 30 + i * 10, 35 + i * 10, 5, 16, 1)
-            glPopMatrix()
-        
-        glPopMatrix()
 
 class Bomb:
     def __init__(self, position):
@@ -2115,7 +2027,7 @@ class Game:
         ]
         
         for pos in spawn_positions:
-            self.enemies.append(AIEnemy(pos))
+            self.enemies.append(Enemy(pos))
     
     def spawn_enemy_at_random_position(self):
   
@@ -2127,7 +2039,7 @@ class Game:
         y = grid_y * grid_size
         z = 25
         
-        return AIEnemy(Vector3(x, y, z))
+        return Enemy(Vector3(x, y, z))
     
     def fire_bullet(self):
   
