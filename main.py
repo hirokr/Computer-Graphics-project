@@ -99,7 +99,7 @@ class EnemyProjectile:
         self.position = Vector3(position.x, position.y, position.z)
         self.direction = direction.normalize()
         self.speed = speed
-        self.size = 3
+        self.size = 6  # Increased size from 3 to 6
         self.life_time = 300  # frames
         self.age = 0
         
@@ -111,7 +111,7 @@ class EnemyProjectile:
     def draw(self):
         glPushMatrix()
         glTranslatef(self.position.x, self.position.y, self.position.z)
-        glColor3f(1.0, 0.5, 0.0)  # Orange projectile
+        glColor3f(0.5, 0.0, 1.0)  # Purple projectile
         glutSolidSphere(self.size, 8, 8)
         glPopMatrix()
         

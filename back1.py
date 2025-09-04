@@ -99,7 +99,7 @@ class EnemyProjectile:
         self.position = Vector3(position.x, position.y, position.z)
         self.direction = direction.normalize()
         self.speed = speed
-        self.size = 3
+        self.size = 6  # Increased size from 3 to 6
         self.life_time = 300  # frames
         self.age = 0
         
@@ -111,7 +111,7 @@ class EnemyProjectile:
     def draw(self):
         glPushMatrix()
         glTranslatef(self.position.x, self.position.y, self.position.z)
-        glColor3f(1.0, 0.5, 0.0)  # Orange projectile
+        glColor3f(0.5, 0.0, 1.0)  # Purple projectile
         glutSolidSphere(self.size, 8, 8)
         glPopMatrix()
         
@@ -124,7 +124,7 @@ class EnemyProjectile:
             distance = self.position.distance_to(player.position)
             return distance < (self.size + player_radius)
 
-class AIEnemy:
+class Enemy:
     def __init__(self, position):
         self.position = Vector3(position.x, position.y, position.z)
         self.original_position = Vector3(position.x, position.y, position.z)
@@ -960,94 +960,6 @@ class Camera:
             gluLookAt(self.position.x + shake_x, self.position.y + shake_y, self.position.z + shake_z,
                         0, 0, 60, 0, 0, 1)
 
-class Skybox:
-    def __init__(self):
-        self.sun_rotation = 0
-        self.moon_rotation = 0
-        self.star_rotation = 0
-        self.time = 0
-        
-    def update(self):
-        self.time += 0.02
-        self.sun_rotation += 0.5
-        self.moon_rotation += 0.3
-        self.star_rotation += 0.1
-        
-        if self.sun_rotation >= 360:
-            self.sun_rotation -= 360
-        if self.moon_rotation >= 360:
-            self.moon_rotation -= 360
-        if self.star_rotation >= 360:
-            self.star_rotation -= 360
-    
-    def draw(self):
-        glPushMatrix()
-        
-        # Draw distant stars as small spheres
-        for i in range(20):
-            angle = i * 18  # 360/20 = 18 degrees apart
-            radius = 1200
-            
-            glPushMatrix()
-            glRotatef(self.star_rotation + angle, 0, 0, 1)
-            glTranslatef(radius, 0, 400 + 100 * math.sin(self.time + i))
-            glColor3f(1.0, 1.0, 0.8)
-            glutSolidSphere(8, 6, 6)
-            glPopMatrix()
-        
-        # Draw animated sun
-        glPushMatrix()
-        glRotatef(self.sun_rotation, 0, 0, 1)
-        glTranslatef(800, 0, 600)
-        glColor3f(1.0, 0.8, 0.0)
-        glutSolidSphere(60, 12, 12)
-        
-        # Sun rays using cylinders
-        for i in range(8):
-            glPushMatrix()
-            glRotatef(i * 45, 0, 0, 1)
-            glTranslatef(80, 0, 0)
-            glRotatef(90, 0, 1, 0)
-            glColor3f(1.0, 0.9, 0.2)
-            gluCylinder(gluNewQuadric(), 3, 1, 30, 6, 6)
-            glPopMatrix()
-        glPopMatrix()
-        
-        # Draw animated moon
-        glPushMatrix()
-        glRotatef(self.moon_rotation, 0, 0, 1)
-        glTranslatef(-700, 0, 500)
-        glColor3f(0.8, 0.8, 0.9)
-        glutSolidSphere(40, 10, 10)
-        
-        # Moon craters
-        glPushMatrix()
-        glTranslatef(15, 15, 20)
-        glColor3f(0.6, 0.6, 0.7)
-        glutSolidSphere(8, 6, 6)
-        glPopMatrix()
-        
-        glPushMatrix()
-        glTranslatef(-10, 20, 25)
-        glColor3f(0.6, 0.6, 0.7)
-        glutSolidSphere(5, 6, 6)
-        glPopMatrix()
-        glPopMatrix()
-        
-        # Draw floating celestial rings
-        for i in range(3):
-            glPushMatrix()
-            glRotatef(self.time * 20 + i * 120, 0, 0, 1)
-            glTranslatef(900 + i * 100, 0, 700 + i * 50)
-            glRotatef(90, 1, 0, 0)
-            glColor3f(0.5 + i * 0.2, 0.3, 0.8 - i * 0.2)
-            
-            # Create ring using cylinder with hollow center
-            gluCylinder(gluNewQuadric(), 30 + i * 10, 35 + i * 10, 5, 16, 1)
-            glPopMatrix()
-        
-        glPopMatrix()
-
 class Bomb:
     def __init__(self, position):
         self.position = Vector3(position.x, position.y, position.z)
@@ -1706,7 +1618,14 @@ class ExplosionEffect:
         
     def create_particles(self):
         """Generate particles based on explosion type"""
-        particle_count = 50 if self.explosion_type == 'boom' else 30
+        if self.explosion_type == 'boom':
+            particle_count = 50
+        elif self.explosion_type == 'warning':
+            particle_count = 40
+        elif self.explosion_type == 'muzzle_flash':
+            particle_count = 20
+        else:
+            particle_count = 30
         
         for _ in range(particle_count):
             # Random direction and speed
@@ -1724,13 +1643,26 @@ class ExplosionEffect:
             if self.explosion_type == 'boom':
                 # Orange/red explosion
                 color = (random.uniform(0.8, 1.0), random.uniform(0.3, 0.7), 0.1, 1.0)
+            elif self.explosion_type == 'warning':
+                # Bright red warning
+                color = (1.0, random.uniform(0.0, 0.3), 0.0, 1.0)
+            elif self.explosion_type == 'muzzle_flash':
+                # Bright yellow/white muzzle flash
+                color = (1.0, 1.0, random.uniform(0.5, 1.0), 1.0)
             else:
                 # Blue/white enemy defeat
                 color = (random.uniform(0.5, 1.0), random.uniform(0.5, 1.0), 1.0, 1.0)
             
             # Particle properties
             size = random.uniform(2, 6) * self.scale_multiplier
-            lifetime = random.randint(30, 80)
+            
+            # Adjust lifetime based on explosion type
+            if self.explosion_type == 'warning':
+                lifetime = random.randint(60, 120)  # Longer for warning
+            elif self.explosion_type == 'muzzle_flash':
+                lifetime = random.randint(10, 30)   # Shorter for muzzle flash
+            else:
+                lifetime = random.randint(30, 80)
             
             # Add some position variation
             pos_offset = Vector3(
@@ -2071,6 +2003,14 @@ class Game:
         self.explosion_effects = []
         self.screen_shake_offset = Vector3(0, 0, 0)
         
+        # Coordinated attack system
+        self.enemies_eliminated = 0
+        self.coordinated_attack_active = False
+        self.coordinated_attack_warning = False
+        self.warning_timer = 0
+        self.warning_duration = 120  # 2 seconds warning
+        self.coordinated_attack_triggered = False
+        
         self.initialize_enemies()
         self.bomb_system.initialize_bombs()
     
@@ -2087,7 +2027,7 @@ class Game:
         ]
         
         for pos in spawn_positions:
-            self.enemies.append(AIEnemy(pos))
+            self.enemies.append(Enemy(pos))
     
     def spawn_enemy_at_random_position(self):
   
@@ -2099,7 +2039,7 @@ class Game:
         y = grid_y * grid_size
         z = 25
         
-        return AIEnemy(Vector3(x, y, z))
+        return Enemy(Vector3(x, y, z))
     
     def fire_bullet(self):
   
@@ -2175,6 +2115,7 @@ class Game:
                     self.enemies.remove(enemy)
                     self.enemies.append(self.spawn_enemy_at_random_position())
                     self.game_score += 1
+                    self.enemies_eliminated += 1
                     
                     # Add 5 seconds to timer as reward for killing enemy
                     if self.timer_active:
@@ -2182,10 +2123,66 @@ class Game:
                         if self.countdown_timer > self.max_countdown_timer:
                             self.countdown_timer = self.max_countdown_timer
                     
-                    print(f"Enemy hit! Score: {self.game_score}")
+                    print(f"Enemy hit! Score: {self.game_score}, Eliminated: {self.enemies_eliminated}")
+                    
+                    # Check for coordinated attack trigger
+                    if self.enemies_eliminated >= 5 and not self.coordinated_attack_triggered:
+                        self.trigger_coordinated_attack_warning()
+                    
                     break
     
+    def trigger_coordinated_attack_warning(self):
+        """Trigger warning phase before coordinated attack"""
+        self.coordinated_attack_warning = True
+        self.warning_timer = 0
+        self.coordinated_attack_triggered = True
+        print("WARNING: Coordinated enemy attack incoming!")
+        
+        # Create warning explosion effects
+        for enemy in self.enemies:
+            warning_explosion = ExplosionEffect(enemy.position, 'warning')
+            self.explosion_effects.append(warning_explosion)
+    
+    def execute_coordinated_attack(self):
+        """Execute the coordinated attack - all enemies fire simultaneously"""
+        self.coordinated_attack_active = True
+        self.coordinated_attack_warning = False
+        
+        print("COORDINATED ATTACK EXECUTED!")
+        
+        # Make all enemies fire at the player simultaneously
+        for enemy in self.enemies:
+            # Force enemy to fire with high accuracy
+            enemy.fire_at_target(accuracy_penalty=0.1)  # Very accurate shots
+            
+            # Create muzzle flash effect
+            muzzle_flash = ExplosionEffect(enemy.position, 'muzzle_flash')
+            self.explosion_effects.append(muzzle_flash)
+        
+        # Reset elimination counter for next coordinated attack
+        self.enemies_eliminated = 0
+        self.coordinated_attack_triggered = False
+    
+    def update_coordinated_attack_system(self):
+        """Update the coordinated attack warning and execution"""
+        if self.coordinated_attack_warning:
+            self.warning_timer += 1
+            
+            # Execute attack after warning period
+            if self.warning_timer >= self.warning_duration:
+                self.execute_coordinated_attack()
+        
+        # Reset coordinated attack state after a brief period
+        if self.coordinated_attack_active:
+            # Allow some time for projectiles to travel
+            if self.warning_timer >= self.warning_duration + 30:  # 0.5 seconds after attack
+                self.coordinated_attack_active = False
+                self.warning_timer = 0
+    
     def update_enemies(self):
+        # Update coordinated attack system
+        self.update_coordinated_attack_system()
+        
         # Update player's cover status
         self.player.check_cover_status(self.cover_system, self.enemies)
         
@@ -2198,8 +2195,13 @@ class Game:
             
             # Check projectile collisions with player
             if enemy.check_projectile_collisions_with_player(self.player):
-                self.player_life -= 1
-                print(f"Player hit by projectile! Life remaining: {self.player_life}")
+                # If coordinated attack is active, instant game over
+                if self.coordinated_attack_active:
+                    self.player_life = 0
+                    print("GAME OVER! Hit by coordinated attack!")
+                else:
+                    self.player_life -= 1
+                    print(f"Player hit by projectile! Life remaining: {self.player_life}")
             
             # Check direct collision with enemy (melee range)
             distance = enemy.position.distance_to(self.player.position)
@@ -2293,6 +2295,13 @@ class Game:
         # Reset explosion state
         self.explosion_active = False
         self.explosion_timer = 0
+        
+        # Reset coordinated attack system
+        self.enemies_eliminated = 0
+        self.coordinated_attack_active = False
+        self.coordinated_attack_warning = False
+        self.warning_timer = 0
+        self.coordinated_attack_triggered = False
         
         # Clear explosion effects
         self.explosion_effects.clear()
@@ -2441,6 +2450,27 @@ class Game:
         glVertex2f(bar_x + fill_width, bar_y + bar_height)
         glVertex2f(bar_x, bar_y + bar_height)
         glEnd()
+        
+        # Draw coordinated attack warnings and status
+        if self.coordinated_attack_warning:
+            # Flashing warning message
+            if (self.warning_timer // 10) % 2 == 0:  # Flash every 10 frames
+                self.renderer.draw_text(250, 450, "!!! COORDINATED ATTACK INCOMING !!!")
+                self.renderer.draw_text(300, 420, "TAKE COVER IMMEDIATELY!")
+            
+            # Warning countdown
+            warning_time_left = (self.warning_duration - self.warning_timer) / 60.0
+            self.renderer.draw_text(350, 390, f"Attack in: {warning_time_left:.1f}s")
+            
+        elif self.coordinated_attack_active:
+            # Attack in progress message
+            self.renderer.draw_text(280, 450, "COORDINATED ATTACK IN PROGRESS!")
+            self.renderer.draw_text(320, 420, "AVOID ALL PROJECTILES!")
+        
+        # Display enemy elimination counter
+        self.renderer.draw_text(10, 590, f"Enemies Eliminated: {self.enemies_eliminated}/5")
+        if self.enemies_eliminated >= 5 and not self.coordinated_attack_triggered:
+            self.renderer.draw_text(10, 560, "Next elimination triggers attack!")
 
         glutSwapBuffers()
 
