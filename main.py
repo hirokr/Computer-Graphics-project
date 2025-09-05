@@ -189,7 +189,7 @@ class Enemy:
         # AI behavior properties
         self.target_position = None
         self.firing_cooldown = 0
-        self.firing_interval = random.randint(60, 180)  # Random firing interval
+        self.firing_interval = random.randint(20, 60)  # Random firing interval
         self.accuracy = random.uniform(0.3, 0.8)  # Random accuracy
         self.projectiles = []
         self.detection_range = 400
