@@ -820,7 +820,7 @@ class Player:
         glPushMatrix()
         glTranslatef(0, 0, 20)
         glColor3f(0.9, 0.7, 0.6)  # Skin color
-        draw_custom_sphere(8, 12, 12)
+        draw_custom_sphere(8, 10, 10)
         glPopMatrix()
         
         # Torso
